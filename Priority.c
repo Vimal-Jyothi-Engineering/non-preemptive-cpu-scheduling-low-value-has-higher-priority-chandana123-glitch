@@ -1,4 +1,4 @@
-   #include <stdio.h>
+#include <stdio.h>
 #include <string.h>
 
 #define MAX 100
@@ -81,4 +81,4 @@ int main() {
     printf("Average Turnaround Time: %.2f\n", total_tat / n);
 
     return 0;
-}     
+}
