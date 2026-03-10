@@ -1,82 +1,84 @@
-#include <stdio.h>
+   #include <stdio.h>
 #include <string.h>
 
-struct Process
-{
+#define MAX 100
+
+typedef struct {
     char pid[10];
-    int at;
-    int bt;
-    int pr;
-    int wt;
-    int tat;
-    int completed;
-};
+    int at;   // Arrival Time
+    int bt;   // Burst Time
+    int pr;   // Priority
+    int wt;   // Waiting Time
+    int tat;  // Turnaround Time
+    int ct;   // Completion Time
+    int done; // 0 = not finished, 1 = finished
+} Process;
 
-int main()
-{
+int main() {
     int n;
-    scanf("%d",&n);
+    Process p[MAX];
 
-    struct Process p[n];
+    scanf("%d", &n);
 
-    for(int i=0;i<n;i++)
-    {
-        scanf("%s %d %d %d",p[i].pid,&p[i].at,&p[i].bt,&p[i].pr);
-        p[i].completed=0;
+    for (int i = 0; i < n; i++) {
+        scanf("%s %d %d %d", p[i].pid, &p[i].at, &p[i].bt, &p[i].pr);
+        p[i].done = 0;
     }
 
-    int time=0,done=0;
-    float total_wt=0,total_tat=0;
+    int completed = 0;
+    int time = 0;
 
-    while(done<n)
-    {
-        int idx=-1;
-        int best_pr=9999;
+    while (completed < n) {
 
-        for(int i=0;i<n;i++)
-        {
-            if(p[i].at<=time && p[i].completed==0)
-            {
-                if(p[i].pr < best_pr)
-                {
-                    best_pr=p[i].pr;
-                    idx=i;
-                }
-                else if(p[i].pr==best_pr)
-                {
-                    if(p[i].at < p[idx].at)
-                    idx=i;
-                }
+        int idx = -1;
+
+        for (int i = 0; i < n; i++) {
+
+            if (p[i].at <= time && p[i].done == 0) {
+
+                if (idx == -1)
+                    idx = i;
+
+                else if (p[i].pr < p[idx].pr)
+                    idx = i;
+
+                else if (p[i].pr == p[idx].pr && p[i].at < p[idx].at)
+                    idx = i;
             }
         }
 
-        if(idx==-1)
-        {
-            time++;
-            continue;
+        if (idx != -1) {
+
+            time += p[idx].bt;
+
+            p[idx].ct = time;
+            p[idx].tat = p[idx].ct - p[idx].at;
+            p[idx].wt = p[idx].tat - p[idx].bt;
+
+            p[idx].done = 1;
+            completed++;
         }
-
-        p[idx].wt = time - p[idx].at;
-        time += p[idx].bt;
-        p[idx].tat = p[idx].wt + p[idx].bt;
-
-        p[idx].completed=1;
-        done++;
-
-        total_wt += p[idx].wt;
-        total_tat += p[idx].tat;
+        else {
+            time++;
+        }
     }
 
+    float total_wt = 0, total_tat = 0;
+
     printf("Waiting Time:\n");
-    for(int i=0;i<n;i++)
-        printf("%s %d\n",p[i].pid,p[i].wt);
+    for (int i = 0; i < n; i++) {
+        printf("%s %d\n", p[i].pid, p[i].wt);
+        total_wt += p[i].wt;
+    }
 
     printf("Turnaround Time:\n");
-    for(int i=0;i<n;i++)
-        printf("%s %d\n",p[i].pid,p[i].tat);
+    for (int i = 0; i < n; i++) {
+        printf("%s %d\n", p[i].pid, p[i].tat);
+        total_tat += p[i].tat;
+    }
 
-    printf("Average Waiting Time: %.2f\n",total_wt/n);
-    printf("Average Turnaround Time: %.2f\n",total_tat/n);
+    printf("Average Waiting Time: %.2f\n", total_wt / n);
+    printf("Average Turnaround Time: %.2f\n", total_tat / n);
 
     return 0;
-}
+}     
