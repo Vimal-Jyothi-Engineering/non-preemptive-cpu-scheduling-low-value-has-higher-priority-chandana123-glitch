@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 
 #define MAX 100
 
@@ -10,7 +11,7 @@ typedef struct {
     int wt;   // Waiting Time
     int tat;  // Turnaround Time
     int ct;   // Completion Time
-    int done; // 0 = not completed
+    int done; // 0 = not finished, 1 = finished
 } Process;
 
 int main() {
@@ -19,11 +20,9 @@ int main() {
 
     scanf("%d", &n);
 
-    // Input
     for (int i = 0; i < n; i++) {
         scanf("%s %d %d %d", p[i].pid, &p[i].at, &p[i].bt, &p[i].pr);
         p[i].done = 0;
-        p[i].wt = p[i].tat = p[i].ct = 0;
     }
 
     int completed = 0;
@@ -37,11 +36,14 @@ int main() {
 
             if (p[i].at <= time && p[i].done == 0) {
 
-                if (idx == -1 || 
-                    p[i].pr < p[idx].pr || 
-                    (p[i].pr == p[idx].pr && p[i].at < p[idx].at)) {
+                if (idx == -1)
                     idx = i;
-                }
+
+                else if (p[i].pr < p[idx].pr)
+                    idx = i;
+
+                else if (p[i].pr == p[idx].pr && p[i].at < p[idx].at)
+                    idx = i;
             }
         }
 
@@ -57,25 +59,25 @@ int main() {
             completed++;
         }
         else {
-            time++; // CPU idle
+            time++;
         }
     }
 
     float total_wt = 0, total_tat = 0;
 
-    printf("\nWaiting Time:\n");
+    printf("Waiting Time:\n");
     for (int i = 0; i < n; i++) {
         printf("%s %d\n", p[i].pid, p[i].wt);
         total_wt += p[i].wt;
     }
 
-    printf("\nTurnaround Time:\n");
+    printf("Turnaround Time:\n");
     for (int i = 0; i < n; i++) {
         printf("%s %d\n", p[i].pid, p[i].tat);
         total_tat += p[i].tat;
     }
 
-    printf("\nAverage Waiting Time: %.2f\n", total_wt / n);
+    printf("Average Waiting Time: %.2f\n", total_wt / n);
     printf("Average Turnaround Time: %.2f\n", total_tat / n);
 
     return 0;
